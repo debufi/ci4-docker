@@ -1,0 +1,51 @@
+version: '3.7'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql/
+      - ./docker/mysql/based.sql:/docker-entrypoint-initdb.d/based.sql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: dbmysite
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - tempest
+
+  php-fpm:
+    build:
+      context: ./
+      dockerfile: ./docker/php/Dockerfile
+    working_dir: /var/www/
+    container_name: phpfpm
+    volumes:
+      - r-volume:/var/www
+    depends_on:
+      - mysql
+    networks:
+      - tempest
+
+  nginx-url:
+    image: nginx:latest
+    container_name: nginx
+    networks:
+      - tempest
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - r-volume:/var/www/
+    depends_on:
+      - php-fpm
+      - mysql
+    ports:
+      - "80:80"
+
+networks:
+  tempest:
+    driver: bridge
+volumes:
+  r-volume:
