@@ -1,5 +1,5 @@
 # Dockerize Codeigniter
-Docker compose to setup nginx, php and mysql for codeigniter 4.0.3.  
+Docker compose to setup nginx, php and mysql for codeigniter 4
 
 ## Images
 1. nginx → nginx:latest
